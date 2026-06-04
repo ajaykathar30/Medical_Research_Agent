@@ -154,7 +154,10 @@ async def send_message_stream(
                     parts.append(text)
                     yield f"data: {json.dumps({'token': text})}\n\n"
         except Exception as e:
-            yield f"data: {json.dumps({'error': str(e)})}\n\n"
+            err_str = str(e)
+            if hasattr(e, 'exceptions'):
+                err_str += " | Details: " + " | ".join(str(sub_e) for sub_e in e.exceptions)
+            yield f"data: {json.dumps({'error': err_str})}\n\n"
 
         # stream done → persist the full answer with a FRESH session
         answer = "".join(parts)
