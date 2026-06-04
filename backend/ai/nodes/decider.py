@@ -10,7 +10,7 @@ from ..config import llm
 
 load_dotenv()
 
-CACHE_DISTANCE_THRESHOLD = 0.5    # cosine distance; lower = closer. TUNE THIS (see note)
+CACHE_DISTANCE_THRESHOLD = 0.25    # cosine distance; lower = closer. TUNE THIS (see note)
 CACHE_MAX_AGE_DAYS = 7
 
 
