@@ -161,6 +161,14 @@ async def send_message_stream(
 
         # stream done → persist the full answer with a FRESH session
         answer = "".join(parts)
+        
+        # fallback: if no chunks were streamed (e.g. fast-path off-topic reply)
+        if not answer:
+            current_state = await agent.aget_state(config={"configurable": {"thread_id": chat_id}})
+            answer = current_state.values.get("answer", "")
+            if answer:
+                yield f"data: {json.dumps({'token': answer})}\n\n"
+
         async with SessionLocal() as s:
             s.add(Message(chat_id=chat_id, role="assistant", content=answer))
             await s.commit()
