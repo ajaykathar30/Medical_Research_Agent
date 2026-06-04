@@ -12,6 +12,7 @@ dependencies = [
     "langchain-mcp-adapters>=0.2.2",
     "langchain-postgres>=0.0.17",
     "langgraph>=1.2.2",
+    "langgraph-checkpoint-postgres>=3.1.0",
     "langgraph-cli[inmem]>=0.4.27",
     "langsmith>=0.8.8",
     "psycopg>=3.3.4",
