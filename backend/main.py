@@ -32,7 +32,7 @@ app = FastAPI(title="Medical Research Agent API", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["http://localhost:5173","https://medical-research-agent-1-727k.onrender.com"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
