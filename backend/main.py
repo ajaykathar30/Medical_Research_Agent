@@ -1,4 +1,4 @@
-# app/main.py
+# main.py
 import sys
 from pathlib import Path
 
