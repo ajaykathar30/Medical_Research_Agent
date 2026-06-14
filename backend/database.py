@@ -14,6 +14,7 @@ engine = create_async_engine(
     pool_recycle=300,        # recycle connections older than 5 min
     pool_size=5,
     max_overflow=10,
+    connect_args={"prepare_threshold": None}, 
 )
 SessionLocal = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 

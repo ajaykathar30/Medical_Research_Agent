@@ -6,9 +6,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from psycopg import AsyncConnection                          
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
-
-
 
 from router import auth, chat
 
@@ -17,15 +16,21 @@ from config import CHECKPOINTER_DB_URI
 from ai.graph import build_graph
 
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # one checkpointer + one compiled graph for the whole app lifetime
-    async with AsyncPostgresSaver.from_conn_string(CHECKPOINTER_DB_URI) as checkpointer:
-        await checkpointer.setup()                 # creates its tables (idempotent)
+
+    conn = await AsyncConnection.connect(                     
+        CHECKPOINTER_DB_URI,
+        autocommit=True,
+        prepare_threshold=None,
+    )
+    try:
+        checkpointer = AsyncPostgresSaver(conn)
+        await checkpointer.setup()                           
         app.state.agent = build_graph(checkpointer=checkpointer)
         yield
-    # connection closes on shutdown
+    finally:
+        await conn.close()                                   
 
 
 app = FastAPI(title="Medical Research Agent API", lifespan=lifespan)
