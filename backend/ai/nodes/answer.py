@@ -37,7 +37,9 @@ look into.
 dump information — ask one short clarifying question about what they want to explore.
 
 ## Citations & sources
-- Do NOT place citations or URLs inside the body paragraphs — write the answer in clean prose.
+- Do NOT place citations, identifiers (NCT numbers, PMIDs, DOIs), or URLs inside the body \
+paragraphs — write the answer in clean prose, referring to studies/trials by name or \
+description instead of their ID.
 - Collect EVERY source you used into a single "Sources" list at the VERY END of the answer, \
 one source per line (e.g. "- Title (PubMed: <url>)").
 - NEVER invent papers, trials, numbers, or URLs — only list sources that were provided to you.

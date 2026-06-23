@@ -1,4 +1,5 @@
 # app/routers/chats.py
+import logging
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
@@ -12,7 +13,11 @@ import json
 from fastapi.responses import StreamingResponse
 from langchain_core.messages import AIMessageChunk
 
+logger = logging.getLogger(__name__)
+
 router = APIRouter(prefix="/chats", tags=["chats"])
+
+GENERIC_AGENT_ERROR = "Something went wrong while generating a response. Please try again."
 
 # HELPER FUNCTION
 def _chunk_text(chunk) -> str:
@@ -105,8 +110,9 @@ async def send_message(
             {"query": body.content},
             config={"configurable": {"thread_id": chat_id}},
         )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Agent error: {e}")
+    except Exception:
+        logger.exception("Agent error while processing message for chat %s", chat_id)
+        raise HTTPException(status_code=500, detail=GENERIC_AGENT_ERROR)
 
     # 3. persist the assistant's answer
     assistant_msg = Message(chat_id=chat_id, role="assistant", content=result.get("answer", ""))
@@ -153,11 +159,9 @@ async def send_message_stream(
                 if text:
                     parts.append(text)
                     yield f"data: {json.dumps({'token': text})}\n\n"
-        except Exception as e:
-            err_str = str(e)
-            if hasattr(e, 'exceptions'):
-                err_str += " | Details: " + " | ".join(str(sub_e) for sub_e in e.exceptions)
-            yield f"data: {json.dumps({'error': err_str})}\n\n"
+        except Exception:
+            logger.exception("Streaming agent error for chat %s", chat_id)
+            yield f"data: {json.dumps({'error': GENERIC_AGENT_ERROR})}\n\n"
 
         # stream done → persist the full answer with a FRESH session
         answer = "".join(parts)
